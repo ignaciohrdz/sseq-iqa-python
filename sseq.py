@@ -145,7 +145,7 @@ class SSEQ:
         :param svr_eps: epsilon for the SVR model
         """
 
-        X = feature_db.loc[:, feature_db.columns[1:-2]].values
+        X = feature_db.loc[:, feature_db.columns[1:-1]].values
         y = feature_db["MOS"].values
 
         params = {
