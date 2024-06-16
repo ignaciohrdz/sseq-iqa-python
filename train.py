@@ -51,6 +51,7 @@ if __name__ == "__main__":
     results = pd.DataFrame(results)
     results.to_csv(path_model / "{}_results.csv".format(args.use_dataset), index=False)
     path_model_file = path_model / "{}_sseq.pkl".format(args.use_dataset)
-    print("Saving SVR model to ", str(path_model_file))
+    print("Best model's score: {:.5f}".format(estimator.svr_regressor[1].best_score_))
+    print("Saving best SVR model to ", str(path_model_file))
     with open(path_model_file, "wb") as f:
         pickle.dump(estimator, f, protocol=pickle.HIGHEST_PROTOCOL)

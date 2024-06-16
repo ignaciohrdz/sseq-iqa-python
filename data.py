@@ -43,8 +43,16 @@ def prepare_csiq(path_csiq: Path):
     return csiq_data
 
 
+def prepare_tid(path_tid: Path):
+    path_images = path_tid / "distorted_images"
+    dataset = pd.read_csv(path_tid / "mos_with_names.txt", names=["score", "image_name"], sep=" ")
+    dataset["image_path"] = dataset["image_name"].apply(lambda x: str(path_images / x))
+    return dataset.loc[:, ["image_path", "image_name", "score"]]
+
+
 dataset_fn_dict = {
     "koniq10k": prepare_koniq,
     "kadid10k": prepare_kadid,
-    "csiq": prepare_csiq
+    "csiq": prepare_csiq,
+    "tid2013": prepare_tid
 }
