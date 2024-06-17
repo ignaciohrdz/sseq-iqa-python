@@ -1,4 +1,4 @@
-# Spatial-Spectral Entropy-base Quality (SSEQ) index
+# Spatial-Spectral Entropy-based Quality (SSEQ) index
 
 This is my implementation of the **SSEQ index**. I wasn't able to find a fully implemented Python version of this index, so I decided to use [Aca4peop's code](https://github.com/Aca4peop/SSEQ-Python) as a starting point and then add my own modifications.
 

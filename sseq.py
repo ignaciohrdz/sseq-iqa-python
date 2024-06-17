@@ -30,7 +30,7 @@ def srocc(y, y_pred):
 
 
 class SSEQ:
-    """ Spatial-Spectral Entropy-base Quality (SSEQ) index (Liu et al.) """
+    """ Spatial-Spectral Entropy-based Quality (SSEQ) index (Liu et al.) """
     def __init__(self,
                  block_size=8,
                  img_size=-1,
