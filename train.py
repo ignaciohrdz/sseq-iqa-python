@@ -23,6 +23,8 @@ if __name__ == "__main__":
                         help="Dataset name: {}".format(list(dataset_fn_dict.keys())))
     parser.add_argument("-m", "--path_model", type=str, default="models",
                         help="Location of the trained SVR models")
+    parser.add_argument("-o", "--overwrite", action="store_true",
+                        help="Overwrite the existing feature database")
     args = parser.parse_args()
 
     # Define the score without a regressor to obtain the features
@@ -32,7 +34,7 @@ if __name__ == "__main__":
 
     path_dataset = Path(args.path_datasets) / args.use_dataset
     path_feature_db = path_dataset / "feature_db.csv"
-    if not path_feature_db.exists():
+    if not path_feature_db.exists() or args.overwrite:
         feature_db = []
         dataset = dataset_fn_dict[args.use_dataset](path_dataset)
         for i, row in enumerate(dataset.to_dict("records")):  # this is much faster than iterrows()

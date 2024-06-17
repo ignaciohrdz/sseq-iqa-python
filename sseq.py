@@ -33,7 +33,7 @@ class SSEQ:
     """ Spatial-Spectral Entropy-base Quality (SSEQ) index (Liu et al.) """
     def __init__(self,
                  block_size=8,
-                 img_size=512,
+                 img_size=-1,
                  percentile=0.6,
                  scales=3,
                  eps=1e-5,
@@ -53,8 +53,9 @@ class SSEQ:
         # Initial resizing
         x_gray = cv2.cvtColor(x, cv2.COLOR_BGR2GRAY)
         x_gray = self.crop_input(x_gray)
-        ratio = self.img_size / max(x_gray.shape)
-        x_gray = cv2.resize(x_gray, None, fx=ratio, fy=ratio, interpolation=cv2.INTER_CUBIC)
+        if self.img_size > 0:
+            ratio = self.img_size / max(x_gray.shape)
+            x_gray = cv2.resize(x_gray, None, fx=ratio, fy=ratio, interpolation=cv2.INTER_CUBIC)
 
         # Extracting the features at different scales
         spac_features, spec_features = self.extract_features(x_gray)
@@ -134,15 +135,10 @@ class SSEQ:
         end = int(x_size - x_size * 0.5 * (1 - self.percentile))
         return x[start:end]
 
-    def fit_svr(self,
-                feature_db,
-                svr_c=1.0,
-                svr_eps=0.1):
+    def fit_svr(self, feature_db):
         """
         Fit an SVR model to a given dataset of features
         :param feature_db: dataframe with 12 features columns, one for train/val/test splitting, and one for MOS
-        :param svr_c: regularization parameter
-        :param svr_eps: epsilon for the SVR model
         """
 
         X = feature_db.loc[:, feature_db.columns[1:-1]].values
