@@ -1,6 +1,4 @@
-"""
-Train a SVR on the several IQA datasets
-"""
+""" Train a SVR on IQA datasets """
 import pandas as pd
 
 from sseq import SSEQ

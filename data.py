@@ -44,6 +44,7 @@ def prepare_csiq(path_csiq: Path):
 
 
 def prepare_tid(path_tid: Path):
+    """ Prepares the TID2013 dataset for training """
     path_images = path_tid / "distorted_images"
     dataset = pd.read_csv(path_tid / "mos_with_names.txt", names=["score", "image_name"], sep=" ")
     dataset["image_path"] = dataset["image_name"].apply(lambda x: str(path_images / x))

@@ -9,7 +9,7 @@ from scipy.stats import pearsonr, spearmanr
 from sklearn.svm import SVR
 from sklearn.metrics import make_scorer
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
 
 
