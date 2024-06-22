@@ -1,6 +1,4 @@
 """ Train a SVR on IQA datasets """
-import pandas as pd
-
 from sseq import SSEQ
 import cv2
 
@@ -51,7 +49,7 @@ if __name__ == "__main__":
     results = pd.DataFrame(results)
     results.to_csv(path_model / "{}_results.csv".format(args.use_dataset), index=False)
     path_model_file = path_model / "{}_sseq.pkl".format(args.use_dataset)
-    print("Best model's score: {:.5f}".format(estimator.svr_regressor[1].best_score_))
+    print("Test results: ", estimator.test_results)
     print("Saving best SVR model to ", str(path_model_file))
     with open(path_model_file, "wb") as f:
         pickle.dump(estimator, f, protocol=pickle.HIGHEST_PROTOCOL)

@@ -9,7 +9,7 @@ from scipy.stats import pearsonr, spearmanr
 from sklearn.svm import SVR
 from sklearn.metrics import make_scorer
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV,train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
@@ -45,6 +45,7 @@ class SSEQ:
         self.eps = eps
         self.unfold = nn.Unfold(kernel_size=self.block_size, stride=self.block_size)
         self.svr_regressor = svr_regressor
+        self.test_results = {'LCC': 0.0, 'SROCC': 0.0}
 
         self.m = self.make_dct_matrix()
         self.m_t = self.m.T
@@ -135,33 +136,50 @@ class SSEQ:
         end = int(x_size - x_size * 0.5 * (1 - self.percentile))
         return x[start:end]
 
-    def fit_svr(self, feature_db):
+    def fit_svr(self, feature_db, n_jobs=4, test_size=0.3):
         """
         Fit an SVR model to a given dataset of features
-        :param feature_db: dataframe with 12 features columns, one for train/val/test splitting, and one for MOS
+        :param feature_db: dataframe with 14 columns: image name + 12 features + MOS
+        :param n_jobs: number of threads for GridSearchCV
+        :param test_size: test set size
         """
 
         X = feature_db.loc[:, feature_db.columns[1:-1]].values
         y = feature_db["MOS"].values
 
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+
         params = {
-            "C": np.arange(1.0, 10, 0.5),
-            "epsilon": np.arange(0.1, 2.0, 0.1)
+            "svr__C": np.arange(1.0, 10, 0.5),
+            "svr__epsilon": np.arange(0.1, 2.0, 0.1)
         }
 
-        svr_search = GridSearchCV(
-            estimator=SVR(),
+        search = GridSearchCV(
+            estimator=make_pipeline(StandardScaler(), SVR()),
             param_grid=params,
             cv=5,
-            n_jobs=4,
+            n_jobs=n_jobs,
             verbose=1,
-            scoring=make_scorer(lcc)
+            scoring={
+                "LCC": make_scorer(lcc),
+                "SROCC": make_scorer(srocc)
+            },
+            error_score=0,
+            refit="SROCC"
         )
 
-        self.svr_regressor = make_pipeline(StandardScaler(), svr_search)
-        self.svr_regressor.fit(X, y)
+        search.fit(X_train, y_train)
+        self.svr_regressor = search.best_estimator_
+        print(self.svr_regressor[1].C, self.svr_regressor[1].epsilon)
 
-        return self.svr_regressor[1].cv_results_
+        # Test metrics
+        y_pred = self.svr_regressor.predict(X_test)
+        self.test_results = {
+            'LCC': lcc(y_test, y_pred),
+            'SROCC': srocc(y_test, y_pred)
+        }
+
+        return search.cv_results_
 
     def predict_score(self, f):
         """ Predicts the score from a set of features """
